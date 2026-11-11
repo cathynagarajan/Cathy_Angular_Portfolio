@@ -1,7 +1,7 @@
 # Kubernetes Repository Knowledge Graph
 
 - **Repository Root**: `/home/krithika/workspace/Cathy_Angular_Portfolio`
-- **Last Updated**: `2026-11-11T21:17:18.056484+00:00`
+- **Last Updated**: `2026-11-11T21:17:32.632216+00:00`
 - **Indexed Files**: `24`
 - **Total Graph Nodes**: `262`
 - **Total Graph Edges**: `564`

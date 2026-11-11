@@ -1,7 +1,33 @@
 [
   {
     "label": "zedCheck",
-    "command": "./server/utils/watch-agent-activity.sh",
+    "command": "bash",
+    "args": [
+      "-c",
+      "for p in \"/home/krithika/workspace/Cathy_Angular_Portfolio/server/utils/watch-agent-activity.sh\" \"/home/krithika/workspace/Cathy_Angular_Portfolio/.zed/watch-agent-activity.sh\" \"$HOME/container/kubernetes/server/utils/watch-agent-activity.sh\"; do [ -f \"$p\" ] && exec bash \"$p\"; done"
+    ],
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "\ud83d\udd0d Query Project Knowledge Graph (query_kg.py --stats)",
+    "command": "python3",
+    "args": [
+      "/home/krithika/workspace/Cathy_Angular_Portfolio/knowledge_graph/query_kg.py",
+      "--stats"
+    ],
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "\ud83d\udd04 Rebuild & Sync Project Knowledge Graph (--pre-commit-hook)",
+    "command": "python3",
+    "args": [
+      "/home/krithika/workspace/Cathy_Angular_Portfolio/knowledge_graph/query_kg.py",
+      "--pre-commit-hook"
+    ],
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "reveal": "always"

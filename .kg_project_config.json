@@ -1,8 +1,19 @@
 {
-  "single_repo_mode": true,
-  "git_remote_url": "",
+  "project_name": "Cathy_Angular_Portfolio",
+  "project_slug": "cathy_angular_portfolio",
+  "project_path": "/home/krithika/workspace/Cathy_Angular_Portfolio",
+  "target_host": "192.168.1.163",
+  "ssh_user": "krithika",
+  "developer_name": "Krithika",
+  "git_remote_url": "https://github.com/cathynagarajan/Cathy_Angular_Portfolio.git",
   "git_branch": "main",
-  "mcp_endpoint": "http://192.168.1.181:8000/mcp",
-  "vectordb_endpoint": "192.168.1.155:30432",
-  "installed_at": "2026-11-11T13:17:07.888696"
+  "git_author_name": "Krithika",
+  "git_author_email": "cathynagarajan@gmail.com",
+  "single_repo_mode": true,
+  "cluster_5node_sync": false,
+  "pgvector_host": "192.168.1.155",
+  "pgvector_port": 30432,
+  "pgvector_table": "kg_vectors_cathy_angular_portfolio",
+  "mcp_gateway": "http://192.168.1.181:8000/mcp",
+  "updated_at": "2026-11-11T21:17:25.080125+00:00"
 }
