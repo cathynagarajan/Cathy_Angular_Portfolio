@@ -1,0 +1,50 @@
+// ============================================================================
+// CATHY'S ANGULAR 21 PORTFOLIO — CLASS 3B BONUS (October 23, 2026)
+// Topic: Arithmetic & Geometric Progression 40-Term Series Generator
+//        Using Java-style 'for' loops (for this.n = 1; this.n <= 40; this.n++)
+//        and String concatenation!
+// Designed & Written by Cathy!
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule],
+  template: `
+    <h1>Hello, {{ name }}!!</h1>
+
+    <p>Enter Number 1: <input type="number" [(ngModel)]="num1"></p>
+    <p>Enter Number 2: <input type="number" [(ngModel)]="num2"></p>
+    <p>Enter n: <input type="number" [(ngModel)]="n"></p>
+    <p>Enter r: <input type="number" [(ngModel)]="r"></p>
+
+    <button (click)="ArithmeticProgression()">ArithmeticProgression!</button>
+    <button (click)="GeometricProgression()">GeometricProgression!</button>
+
+    <h2>Total = {{ total }}</h2>
+  `
+})
+export class App {
+  name = 'Cathy the Angular Pro';
+  num1 = 0;
+  num2 = 0;
+  n = 1;
+  r = 1;
+  total: any = 0;
+
+  ArithmeticProgression() {
+    this.total = "";
+    for (this.n = 1; this.n <= 40; this.n++) {
+      this.total = this.total + (this.num1 + (this.n - 1) * this.num2) + ", ";
+    }
+  }
+
+  GeometricProgression() {
+    this.total = "";
+    for (this.n = 1; this.n <= 40; this.n++) {
+      this.total = this.total + (this.num1 * (this.r ** (this.n - 1))) + ", ";
+    }
+  }
+}

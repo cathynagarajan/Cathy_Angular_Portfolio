@@ -1,0 +1,378 @@
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
+
+@Component({
+  selector: 'app-root',
+  imports: [
+    FormsModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatCardModule,
+    MatExpansionModule
+  ],
+  template: `
+    <!-- #2 UP-NAV: Starbucks Forest-Green Header Bar -->
+    <mat-toolbar [style.background]="isCaramelTheme ? '#78350f' : '#1e3932'"
+                 style="color: white; display: flex; justify-content: space-between; padding: 0 20px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button mat-raised-button (click)="sidenav.toggle()">☰ Menu</button>
+        <span style="font-weight: 800; letter-spacing: 1px; font-size: 18px; cursor: pointer;" (click)="backToMenu()">
+          ☕ CATHY'S SBX RESERVE
+        </span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px; font-size: 14px;">
+        <mat-slide-toggle [(ngModel)]="isCaramelTheme">
+          <span style="color: white;">
+            {{ isCaramelTheme ? '🍯 Caramel Roast' : '🌲 SBX Forest Green' }}
+          </span>
+        </mat-slide-toggle>
+
+        <span style="background: #00704A; border: 2px solid #cba258; color: white; padding: 4px 14px; border-radius: 20px; font-weight: bold;">
+          🛒 Bag ({{ cartCount }}) — $ {{ cartTotal.toFixed(2) }}
+        </span>
+      </div>
+    </mat-toolbar>
+
+    <!-- #3 CONTAINER: Holds Left Side-Nav (#4) + Right Screen Together -->
+    <mat-sidenav-container style="height: 90vh;">
+
+      <!-- #4 LEFT SIDE-NAV -->
+      <mat-sidenav #sidenav mode="side" opened
+                   style="width: 265px; padding: 16px; background: #f9f9f9; border-right: 1px solid #e2e8f0;">
+        <h3 style="margin-top: 0; color: #1e3932; font-weight: 800;">Menu</h3>
+
+        <mat-expansion-panel [expanded]="true" style="margin-bottom: 10px;">
+          <mat-expansion-panel-header><strong>☕ Drinks</strong></mat-expansion-panel-header>
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;" (click)="showCategory('Coffee')">
+              ☕ Hot & Iced Coffees
+            </button>
+          </p>
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;" (click)="showCategory('Tea')">
+              🫖 Chai & Artisanal Teas
+            </button>
+          </p>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header><strong>🥐 Food & Bakery</strong></mat-expansion-panel-header>
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;" (click)="showCategory('Bakery')">
+              🍋 Bakery, Cakes & Biscuits
+            </button>
+          </p>
+        </mat-expansion-panel>
+      </mat-sidenav>
+
+      <!-- RIGHT MAIN SCREEN -->
+      <mat-sidenav-content [style.background]="isCaramelTheme ? '#fffbeb' : '#f1f8f5'" style="padding: 24px;">
+
+        <!-- SBX REWARDS / LOYALTY # BAR -->
+        <div style="background: white; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #00704A; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <strong style="color: #1e3932;">⭐ SBX Rewards® Loyalty #:</strong>
+            <input type="text" [(ngModel)]="memberId" placeholder="Enter Member ID (e.g. SBX100)"
+                   style="padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 20px; width: 210px;" />
+            <button mat-raised-button (click)="checkLoyalty()" style="background: #00704A; color: white; border-radius: 20px;">
+              Link Account
+            </button>
+          </div>
+          <span style="font-weight: bold; color: #00704A;">{{ loyaltyMessage }}</span>
+        </div>
+
+        @if (statusMessage != '') {
+          <div style="background: #d1fae5; color: #065f46; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-weight: bold;">
+            {{ statusMessage }}
+          </div>
+        }
+
+        <!-- ============================================================== -->
+        <!-- SCREEN A: WHEN NO ITEM IS CLICKED -> SHOW FULL MENU GRID!      -->
+        <!-- ============================================================== -->
+        @if (activeItem == null) {
+          <h2 style="color: #1e3932; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px;">
+            {{ categoryTitle }} <span style="font-size: 13px; color: #64748b; font-weight: normal;">(Click any item to Customize & View Nutrition!)</span>
+          </h2>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;">
+            @for (item of displayedItems; track item.name) {
+              <mat-card (click)="openCustomizer(item)"
+                        style="padding: 18px; background: white; border-radius: 16px; text-align: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+                <div style="width: 110px; height: 110px; margin: 0 auto 12px auto; border-radius: 50%; background: #1e3932; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                  {{ item.icon }}
+                </div>
+
+                <h3 style="margin: 6px 0 4px 0; color: #1e3932; font-size: 17px;">{{ item.name }}</h3>
+                <p style="color: #64748b; font-size: 13px; min-height: 36px; margin: 0 0 8px 0;">{{ item.desc }}</p>
+                <p style="font-weight: 800; color: #00704A; font-size: 15px; margin: 4px 0 12px 0;">
+                  $ {{ item.price.toFixed(2) }} · <span style="font-weight: normal; color: #64748b; font-size: 12px;">{{ item.calories }} cal</span>
+                </p>
+
+                <button mat-raised-button
+                        [style.background]="isCaramelTheme ? '#d97706' : '#00704A'"
+                        style="color: white; border-radius: 20px; width: 100%;">
+                  ⚙️ Customize & Nutrition
+                </button>
+              </mat-card>
+            }
+          </div>
+        }
+
+        <!-- ============================================================== -->
+        <!-- SCREEN B: WHEN ANY ITEM IS CLICKED -> CUSTOMIZER & NUTRITION!  -->
+        <!-- ============================================================== -->
+        @if (activeItem != null) {
+          <button mat-stroked-button (click)="backToMenu()" style="margin-bottom: 16px; background: white;">
+            ← Back to {{ categoryTitle }}
+          </button>
+
+          <mat-card style="max-width: 720px; padding: 24px; background: white; border-radius: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.10);">
+            <!-- Top Banner of Selected Item -->
+            <div style="display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap;">
+              <div style="width: 100px; height: 100px; border-radius: 50%; background: #1e3932; display: flex; align-items: center; justify-content: center; font-size: 46px;">
+                {{ activeItem.icon }}
+              </div>
+              <div style="flex: 1;">
+                <h2 style="margin: 0 0 4px 0; color: #1e3932;">{{ activeItem.name }}</h2>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">{{ activeItem.desc }}</p>
+              </div>
+              <div style="background: #1e3932; color: #cba258; padding: 10px 18px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: 800; color: white;">$ {{ getCustomPrice().toFixed(2) }}</div>
+                <div style="font-size: 13px; font-weight: bold;">🔥 {{ getCustomCalories() }} Calories</div>
+              </div>
+            </div>
+
+            <!-- CUSTOMIZATION OPTIONS FOR DRINKS (Coffee & Tea/Chai) -->
+            @if (activeItem.type == 'drink') {
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <label style="font-weight: bold; color: #1e3932; display: block; margin-bottom: 6px;">1. Size Options</label>
+                  <select [(ngModel)]="selectedSize" style="width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <option value="Small">Small / Tall (12 oz)</option>
+                    <option value="Large">Large / Grande (16 oz)</option>
+                    <option value="Venti">Venti (20 oz)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: bold; color: #1e3932; display: block; margin-bottom: 6px;">2. Milk Choice</label>
+                  <select [(ngModel)]="selectedMilk" style="width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <option value="2% Milk">2% Milk (Standard)</option>
+                    <option value="Skim Milk">Skim / Nonfat Milk (-40 cal)</option>
+                    <option value="Oatmilk">Oatmilk (+20 cal, +$0.70)</option>
+                    <option value="Almondmilk">Almondmilk (-50 cal, +$0.70)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: bold; color: #1e3932; display: block; margin-bottom: 6px;">3. Sugar / Sweetness</label>
+                  <select [(ngModel)]="selectedSugar" style="width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <option value="Regular">Regular Sweetness</option>
+                    <option value="Half Sweet">Half Sweet (-35 cal)</option>
+                    <option value="No Sugar">No Sugar / Unsweetened (-70 cal)</option>
+                  </select>
+                </div>
+              </div>
+            }
+
+            <!-- CUSTOMIZATION OPTIONS FOR BAKERY (Cakes, Bread & Biscuits) -->
+            @if (activeItem.type == 'bakery') {
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <label style="font-weight: bold; color: #1e3932; display: block; margin-bottom: 6px;">1. Portion Size</label>
+                  <select [(ngModel)]="selectedSize" style="width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <option value="Small">Half Portion / Petite (-45% cal)</option>
+                    <option value="Large">Regular Full Slice / Piece</option>
+                    <option value="Venti">Shareable 2-Pack (2x)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: bold; color: #1e3932; display: block; margin-bottom: 6px;">2. Sugar / Topping</label>
+                  <select [(ngModel)]="selectedSugar" style="width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <option value="Regular">Classic Bakery Recipe</option>
+                    <option value="No Sugar">Light / No Icing Drizzle (-60 cal)</option>
+                    <option value="Half Sweet">Add Whipped Butter (+50 cal)</option>
+                  </select>
+                </div>
+              </div>
+            }
+
+            <div style="margin-bottom: 18px;">
+              <mat-slide-toggle [(ngModel)]="serveWarm">
+                🔥 {{ activeItem.type == 'drink' ? 'Extra Hot / Steamed' : 'Warmed in Oven' }}
+              </mat-slide-toggle>
+            </div>
+
+            <!-- LIVE NUTRITION FACTS BOX -->
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 8px 0; color: #1e3932;">📋 Live Nutrition Facts ({{ selectedSize }})</h4>
+              <div style="display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; color: #334155;">
+                <span><strong>Calories:</strong> {{ getCustomCalories() }} kcal</span>
+                <span><strong>Sugar:</strong> {{ getCustomSugar() }} g</span>
+                @if (activeItem.type == 'drink') {
+                  <span><strong>Milk:</strong> {{ selectedMilk }}</span>
+                }
+                <span><strong>Prep:</strong> {{ serveWarm ? 'Warm / Extra Hot' : 'Standard' }}</span>
+              </div>
+            </div>
+
+            <button mat-raised-button
+                    (click)="addCustomizedToBag()"
+                    [style.background]="isCaramelTheme ? '#d97706' : '#00704A'"
+                    style="color: white; border-radius: 24px; width: 100%; padding: 10px; font-size: 15px; font-weight: bold;">
+              🛒 Add Customized {{ activeItem.name }} to Bag — $ {{ getCustomPrice().toFixed(2) }}
+            </button>
+          </mat-card>
+        }
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class App {
+  isCaramelTheme: boolean = false;
+  memberId: string = '';
+  loyaltyMessage: string = '';
+  cartCount: number = 0;
+  cartTotal: number = 0;
+  statusMessage: string = '';
+
+  categoryTitle: string = '☕ Hot & Iced Coffees';
+
+  // Holds whichever item the user clicked (null = show Menu Grid!)
+  activeItem: any = null;
+  selectedSize: string = 'Large';
+  selectedMilk: string = '2% Milk';
+  selectedSugar: string = 'Regular';
+  serveWarm: boolean = true;
+
+  coffeeList = [
+    { name: 'Caramel Macchiato', type: 'drink', desc: 'Freshly steamed milk with vanilla syrup & caramel drizzle', price: 5.45, calories: 250, sugar: 33, icon: '☕' },
+    { name: 'Caffè Latte', type: 'drink', desc: 'Dark, rich signature espresso balanced with steamed milk', price: 4.95, calories: 190, sugar: 18, icon: '🥛' },
+    { name: 'Caffè Americano', type: 'drink', desc: 'Espresso shots topped with hot water for a rich crema layer', price: 3.95, calories: 15, sugar: 0, icon: '🖤' },
+    { name: 'Brown Sugar Oat Espresso', type: 'drink', desc: 'Blonde espresso shaken with brown sugar & cinnamon over oatmilk', price: 5.75, calories: 120, sugar: 12, icon: '🧊' }
+  ];
+
+  teaList = [
+    { name: 'Masala Chai Tea Latte', type: 'drink', desc: 'Black tea infused with cardamom, cinnamon, ginger & steamed milk', price: 5.25, calories: 240, sugar: 42, icon: '🫖' },
+    { name: 'Iced Dirty Chai Latte', type: 'drink', desc: 'Spiced black tea blended with milk, ice & a bold shot of espresso', price: 5.65, calories: 260, sugar: 40, icon: '🥤' },
+    { name: 'Matcha Green Tea Latte', type: 'drink', desc: 'Smooth & creamy ceremonial matcha sweetened just right with milk', price: 5.45, calories: 240, sugar: 32, icon: '🍵' },
+    { name: 'London Fog Earl Grey', type: 'drink', desc: 'Bright, citrusy Earl Grey tea with lavender & vanilla foam', price: 4.95, calories: 180, sugar: 23, icon: '🌿' }
+  ];
+
+  bakeryList = [
+    { name: 'Iced Lemon Pound Cake', type: 'bakery', desc: 'Moist, zesty lemon cake topped with a sweet tart lemon icing', price: 4.25, calories: 470, sugar: 42, icon: '🍋' },
+    { name: 'Pistachio Swirl Loaf Cake', type: 'bakery', desc: 'Rich pistachio bakery cake with roasted pistachio crumble', price: 4.65, calories: 410, sugar: 34, icon: '🍰' },
+    { name: 'Banana Walnut Bread', type: 'bakery', desc: 'Home-style moist banana bread loaded with crunchy walnuts', price: 4.25, calories: 420, sugar: 29, icon: '🍞' },
+    { name: 'Golden Butter Tea Biscuits', type: 'bakery', desc: 'Crisp, buttery bakery biscuits — made for dipping in hot Chai!', price: 3.50, calories: 310, sugar: 14, icon: '🍪' }
+  ];
+
+  displayedItems = this.coffeeList;
+
+  showCategory(cat: string) {
+    this.activeItem = null;
+    this.statusMessage = '';
+    if (cat == 'Coffee') {
+      this.categoryTitle = '☕ Hot & Iced Coffees';
+      this.displayedItems = this.coffeeList;
+    } else if (cat == 'Tea') {
+      this.categoryTitle = '🫖 Chai & Artisanal Teas';
+      this.displayedItems = this.teaList;
+    } else if (cat == 'Bakery') {
+      this.categoryTitle = '🍋 Bakery, Cakes, Bread & Tea Biscuits';
+      this.displayedItems = this.bakeryList;
+    }
+  }
+
+  openCustomizer(item: any) {
+    this.activeItem = item;
+    this.selectedSize = 'Large';
+    this.selectedMilk = '2% Milk';
+    this.selectedSugar = 'Regular';
+    this.serveWarm = true;
+    this.statusMessage = '';
+  }
+
+  backToMenu() {
+    this.activeItem = null;
+  }
+
+  getCustomCalories(): number {
+    let cal = this.activeItem.calories;
+
+    if (this.selectedSize == 'Small') {
+      cal = Math.round(cal * 0.72);
+    } else if (this.selectedSize == 'Venti') {
+      cal = Math.round(cal * 1.35);
+    }
+
+    if (this.activeItem.type == 'drink') {
+      if (this.selectedMilk == 'Skim Milk') { cal = cal - 40; }
+      else if (this.selectedMilk == 'Oatmilk') { cal = cal + 20; }
+      else if (this.selectedMilk == 'Almondmilk') { cal = cal - 50; }
+
+      if (this.selectedSugar == 'Half Sweet') { cal = cal - 35; }
+      else if (this.selectedSugar == 'No Sugar') { cal = cal - 70; }
+    } else {
+      if (this.selectedSugar == 'No Sugar') { cal = cal - 60; }
+      else if (this.selectedSugar == 'Half Sweet') { cal = cal + 50; }
+    }
+
+    if (cal < 5) { cal = 5; }
+    return cal;
+  }
+
+  getCustomSugar(): number {
+    let g = this.activeItem.sugar;
+    if (this.selectedSize == 'Small') { g = Math.round(g * 0.72); }
+    else if (this.selectedSize == 'Venti') { g = Math.round(g * 1.30); }
+
+    if (this.selectedSugar == 'Half Sweet' && this.activeItem.type == 'drink') { g = Math.round(g * 0.5); }
+    else if (this.selectedSugar == 'No Sugar') { g = Math.max(0, g - 28); }
+    return g;
+  }
+
+  getCustomPrice(): number {
+    let p = this.activeItem.price;
+    if (this.selectedSize == 'Small') { p = p - 0.60; }
+    else if (this.selectedSize == 'Venti') { p = p + 0.65; }
+
+    if (this.activeItem.type == 'drink' && (this.selectedMilk == 'Oatmilk' || this.selectedMilk == 'Almondmilk')) {
+      p = p + 0.70;
+    }
+    return p;
+  }
+
+  checkLoyalty() {
+    if (this.memberId == 'SBX100') {
+      this.loyaltyMessage = '🌟 VIP Gold Member Cathy! 1,250 Stars — Free Bakery Item Ready!';
+    } else if (this.memberId != '') {
+      this.loyaltyMessage = '✅ Member #' + this.memberId + ' linked! Earning 2★ per $1.';
+    } else {
+      this.loyaltyMessage = '⚠️ Please enter your SBX Loyalty # first!';
+    }
+  }
+
+  addCustomizedToBag() {
+    const finalPrice = this.getCustomPrice();
+    this.cartCount = this.cartCount + 1;
+    this.cartTotal = this.cartTotal + finalPrice;
+    const details = this.activeItem.type == 'drink'
+      ? this.selectedSize + ', ' + this.selectedMilk + ', ' + this.selectedSugar
+      : this.selectedSize + ', ' + (this.serveWarm ? 'Oven Warmed' : 'Room Temp');
+    this.statusMessage = '✅ Added ' + this.activeItem.name + ' (' + details + ' — ' + this.getCustomCalories() + ' cal) to Bag!';
+    this.activeItem = null;
+  }
+}

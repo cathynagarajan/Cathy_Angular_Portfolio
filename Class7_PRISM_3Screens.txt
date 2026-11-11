@@ -1,0 +1,224 @@
+// ============================================================================
+// CATHY'S ANGULAR 21 PORTFOLIO — CLASS 8 (October 25, 2026)
+// Topic: Full Ardent Mills PRISM Portal (Left Sidebar Menu + 3 Live Screens!)
+//        Left Menu: Production Day, Forecast, Movements, Internal Sales Orders,
+//                   Daily Bin Inventory, Quality Hold
+//        Right Screen switches using @if (currentTab == '...'):
+//          1. Internal Sales Orders -> TRU# table + clickable [Receive] button
+//          2. Daily Bin Inventory   -> Bin 801-804 table + Feet Down / Empty Bin math
+//          3. Quality Hold          -> Food Safety / On Hold + [+ New Hold] button
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule],
+  template: `
+    <h2>PRISM — {{ userName }} | Location: {{ plantLocation }}</h2>
+
+    <table border="1" cellpadding="12">
+      <tr>
+        <!-- LEFT COLUMN: VERTICAL PRISM INVENTORY MENU -->
+        <td valign="top" width="200">
+          <h3>Inventory</h3>
+          <p><button (click)="SelectTab('Production Day')">Production Day</button></p>
+          <p><button (click)="SelectTab('Forecast')">Forecast</button></p>
+          <p><button (click)="SelectTab('Movements')">Movements</button></p>
+          <p><button (click)="SelectTab('Internal Sales Orders')">Internal Sales Orders</button></p>
+          <p><button (click)="SelectTab('Daily Bin Inventory')">Daily Bin Inventory</button></p>
+          <p><button (click)="SelectTab('Quality Hold')">Quality Hold</button></p>
+        </td>
+
+        <!-- RIGHT COLUMN: ACTIVE SCREEN POPULATES HERE BASED ON CLICKED TAB -->
+        <td valign="top" width="900">
+          <h3>Inventory > {{ currentTab }}</h3>
+
+          <!-- SCREEN 1: INTERNAL SALES ORDERS (TRU# TABLE) -->
+          @if (currentTab == 'Internal Sales Orders') {
+            <table border="1" cellpadding="6">
+              <tr>
+                <th>Order #</th>
+                <th>Shipping Plant</th>
+                <th>Shipping Plant Name</th>
+                <th>Item Description</th>
+                <th>Item #</th>
+                <th>Order Qty</th>
+                <th>Ship Qty (LB)</th>
+                <th>Item Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+              @for (ord of orderList; track ord) {
+                <tr>
+                  <td>{{ ord.orderNum }}</td>
+                  <td>{{ ord.plantCode }}</td>
+                  <td>{{ ord.plantName }}</td>
+                  <td>{{ ord.itemDesc }}</td>
+                  <td>{{ ord.itemNum }}</td>
+                  <td>{{ ord.orderQty }}</td>
+                  <td>{{ ord.shipQty }}</td>
+                  <td>{{ ord.itemType }}</td>
+                  <td><b>{{ ord.status }}</b></td>
+                  <td>
+                    <button (click)="ReceiveOrder(ord)">Receive</button>
+                  </td>
+                </tr>
+              }
+            </table>
+          }
+
+          <!-- SCREEN 2: DAILY BIN INVENTORY (801-804 TABLE) -->
+          @if (currentTab == 'Daily Bin Inventory') {
+            <table border="1" cellpadding="6">
+              <tr>
+                <th>Bin Name</th>
+                <th>Bin Type</th>
+                <th>Item Description</th>
+                <th>Item #</th>
+                <th>Feet Down</th>
+                <th>Inventory</th>
+                <th>Empty Bin</th>
+                <th>Capacity</th>
+                <th>Open Capacity</th>
+                <th>Bin Feet</th>
+                <th>CWT/F</th>
+                <th>Status</th>
+              </tr>
+              @for (bin of binList; track bin) {
+                <tr>
+                  <td>{{ bin.binName }}</td>
+                  <td>{{ bin.binType }}</td>
+                  <td>{{ bin.itemDesc }}</td>
+                  <td>{{ bin.itemNum }}</td>
+                  <td>
+                    <input type="number" [(ngModel)]="bin.feetDown" (change)="CalculateBin(bin)">
+                  </td>
+                  <td><b>{{ bin.inventory }}</b></td>
+                  <td>
+                    <input type="checkbox" [(ngModel)]="bin.emptyBin" (change)="CalculateBin(bin)">
+                  </td>
+                  <td>{{ bin.capacity }}</td>
+                  <td><b>{{ bin.openCapacity }}</b></td>
+                  <td>{{ bin.binFeet }}</td>
+                  <td>{{ bin.cwtPerFoot }}</td>
+                  <td>{{ bin.status }}</td>
+                </tr>
+              }
+            </table>
+          }
+
+          <!-- SCREEN 3: QUALITY HOLD (FOOD SAFETY / ON HOLD + NEW HOLD BUTTON) -->
+          @if (currentTab == 'Quality Hold') {
+            <p>
+              Type:
+              <select [(ngModel)]="holdType">
+                <option>Food Safety</option>
+                <option>Packaging Defect</option>
+                <option>Temperature Excursion</option>
+              </select>
+              Status:
+              <select [(ngModel)]="holdStatus">
+                <option>On Hold</option>
+                <option>Released</option>
+              </select>
+              Item #: <input type="text" [(ngModel)]="holdItemNum">
+              Item Description: <input type="text" [(ngModel)]="holdItemDesc">
+              <button (click)="AddQualityHold()">+ New Hold</button>
+            </p>
+
+            <table border="1" cellpadding="6">
+              <tr>
+                <th>LOG CODE</th>
+                <th>STATUS</th>
+                <th>HOLD DATE</th>
+                <th>TYPE</th>
+                <th>ITEM NUMBER</th>
+                <th>ITEM DESCRIPTION</th>
+              </tr>
+              @for (h of holdList; track h) {
+                <tr>
+                  <td>{{ h.logCode }}</td>
+                  <td><b>{{ h.status }}</b></td>
+                  <td>{{ h.holdDate }}</td>
+                  <td>{{ h.type }}</td>
+                  <td>{{ h.itemNum }}</td>
+                  <td>{{ h.itemDesc }}</td>
+                </tr>
+              }
+            </table>
+          }
+
+          <h4>{{ message }}</h4>
+        </td>
+      </tr>
+    </table>
+  `
+})
+export class App {
+  userName = 'Cathy Nagarajan';
+  plantLocation = '1007 - Colton';
+  currentTab = 'Internal Sales Orders';
+  message = '';
+
+  // Data for Screen 1: Internal Sales Orders
+  orderList: any = [
+    { orderNum: 'TRU1000140991', plantCode: '1032', plantName: 'SAN BERNARDINO CA', itemDesc: 'H52',                          itemNum: '2000742', orderQty: 520, shipQty: 51400, itemType: 'Bulk', status: 'In Transit' },
+    { orderNum: 'TRU1000139561', plantCode: '1009', plantName: 'COMMERCE CITY CO',  itemDesc: 'UG HARD WHITE WW FLR 50LB-AA', itemNum: '5140106', orderQty: 850, shipQty: 850,   itemType: 'Pack', status: 'Loaded' },
+    { orderNum: 'TRU1000140992', plantCode: '1032', plantName: 'SAN BERNARDINO CA', itemDesc: 'H52',                          itemNum: '2000742', orderQty: 520, shipQty: 51240, itemType: 'Bulk', status: 'In Transit' }
+  ];
+
+  // Data for Screen 2: Daily Bin Inventory
+  binList: any = [
+    { binName: '801', binType: 'WIP Storage', itemDesc: 'E50', itemNum: '2000483', feetDown: 45, inventory: 0,    emptyBin: false, capacity: 1800, openCapacity: 1800, binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '802', binType: 'WIP Storage', itemDesc: 'A50', itemNum: '2000213', feetDown: 32, inventory: 520,  emptyBin: false, capacity: 1800, openCapacity: 1280, binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '803', binType: 'WIP Storage', itemDesc: 'E50', itemNum: '2000483', feetDown: 14, inventory: 1240, emptyBin: false, capacity: 1800, openCapacity: 560,  binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '804', binType: 'WIP Storage', itemDesc: 'R54', itemNum: '2001438', feetDown: 38, inventory: 280,  emptyBin: false, capacity: 1800, openCapacity: 1520, binFeet: 45, cwtPerFoot: 40, status: 'Active' }
+  ];
+
+  // Data for Screen 3: Quality Hold
+  holdType = 'Food Safety';
+  holdStatus = 'On Hold';
+  holdItemNum = '2000483';
+  holdItemDesc = 'E50';
+  holdList: any = [
+    { logCode: 'QH-1001', status: 'On Hold', holdDate: '10/25/2026', type: 'Food Safety', itemNum: '2000483', itemDesc: 'E50' }
+  ];
+
+  SelectTab(tabName: any) {
+    this.currentTab = tabName;
+    this.message = '';
+  }
+
+  ReceiveOrder(ord: any) {
+    if (ord.status == 'In Transit') {
+      ord.status = 'Received';
+      this.message = 'Order ' + ord.orderNum + ' has been Received!';
+    } else {
+      this.message = 'Cannot Receive Order ' + ord.orderNum + ' — Status is ' + ord.status;
+    }
+  }
+
+  CalculateBin(bin: any) {
+    if (bin.emptyBin == true) {
+      bin.inventory = 0;
+      bin.openCapacity = bin.capacity;
+    } else {
+      bin.openCapacity = bin.feetDown * bin.cwtPerFoot;
+      bin.inventory = bin.capacity - bin.openCapacity;
+    }
+  }
+
+  AddQualityHold() {
+    this.holdList.push({
+      logCode: 'QH-' + (1001 + this.holdList.length),
+      status: this.holdStatus,
+      holdDate: '10/25/2026',
+      type: this.holdType,
+      itemNum: this.holdItemNum,
+      itemDesc: this.holdItemDesc
+    });
+    this.message = 'Added Quality Hold for Item ' + this.holdItemNum;
+  }
+}

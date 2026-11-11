@@ -1,0 +1,73 @@
+// ============================================================================
+// CATHY'S ANGULAR 21 PORTFOLIO — CLASS 7 (Saved for After Tuesday's Northrop!)
+// Topic: Recreating Ardent Mills PRISM "Daily Bin Inventory" (1007 - Colton)
+//        Combines Class 2 Math (Capacity = Bin Feet * CWT/F; Open Capacity =
+//        Feet Down * CWT/F; Inventory = Capacity - Open Capacity) +
+//        Class 3 If/Else (Empty Bin checkbox) + Class 6 Table (@for)!
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule],
+  template: `
+    <h2>PRISM — Daily Bin Inventory (1007 - Colton)</h2>
+
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>Bin Name</th>
+        <th>Bin Type</th>
+        <th>Item Description</th>
+        <th>Item #</th>
+        <th>Feet Down</th>
+        <th>Inventory</th>
+        <th>Empty Bin</th>
+        <th>Capacity</th>
+        <th>Open Capacity</th>
+        <th>Bin Feet</th>
+        <th>CWT/F</th>
+        <th>Status</th>
+      </tr>
+      @for (bin of binList; track bin) {
+        <tr>
+          <td>{{ bin.binName }}</td>
+          <td>{{ bin.binType }}</td>
+          <td>{{ bin.itemDesc }}</td>
+          <td>{{ bin.itemNum }}</td>
+          <td>
+            <input type="number" [(ngModel)]="bin.feetDown" (change)="CalculateBin(bin)">
+          </td>
+          <td><b>{{ bin.inventory }}</b></td>
+          <td>
+            <input type="checkbox" [(ngModel)]="bin.emptyBin" (change)="CalculateBin(bin)">
+          </td>
+          <td>{{ bin.capacity }}</td>
+          <td><b>{{ bin.openCapacity }}</b></td>
+          <td>{{ bin.binFeet }}</td>
+          <td>{{ bin.cwtPerFoot }}</td>
+          <td>{{ bin.status }}</td>
+        </tr>
+      }
+    </table>
+  `
+})
+export class App {
+  binList: any = [
+    { binName: '801', binType: 'WIP Storage', itemDesc: 'E50', itemNum: '2000483', feetDown: 45, inventory: 0,    emptyBin: false, capacity: 1800, openCapacity: 1800, binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '802', binType: 'WIP Storage', itemDesc: 'A50', itemNum: '2000213', feetDown: 32, inventory: 520,  emptyBin: false, capacity: 1800, openCapacity: 1280, binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '803', binType: 'WIP Storage', itemDesc: 'E50', itemNum: '2000483', feetDown: 14, inventory: 1240, emptyBin: false, capacity: 1800, openCapacity: 560,  binFeet: 45, cwtPerFoot: 40, status: 'Active' },
+    { binName: '804', binType: 'WIP Storage', itemDesc: 'R54', itemNum: '2001438', feetDown: 38, inventory: 280,  emptyBin: false, capacity: 1800, openCapacity: 1520, binFeet: 45, cwtPerFoot: 40, status: 'Active' }
+  ];
+
+  CalculateBin(bin: any) {
+    if (bin.emptyBin == true) {
+      bin.inventory = 0;
+      bin.openCapacity = bin.capacity;
+    } else {
+      bin.openCapacity = bin.feetDown * bin.cwtPerFoot;
+      bin.inventory = bin.capacity - bin.openCapacity;
+    }
+  }
+}

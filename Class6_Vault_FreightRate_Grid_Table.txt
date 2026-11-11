@@ -1,0 +1,145 @@
+// ============================================================================
+// CATHY'S ANGULAR 21 PORTFOLIO — CLASS 6 (October 24, 2026)
+// Topic: Full Ardent Mills Vault Freight Rate Screen + 100% Dynamic User Grid!
+//        Starts completely empty (no hardcoded table rows!) — every row in the
+//        10-column Vault Grid is entered dynamically by the user on the screen!
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule],
+  template: `
+    <h2>Add Freight Rate — Ardent Mills Vault</h2>
+
+    <p>
+      Location: <input type="text" [(ngModel)]="location">
+      Ship From *:
+      <select [(ngModel)]="shipFrom">
+        @for (mill of sqlShipFromList; track mill) {
+          <option>{{ mill }}</option>
+        }
+      </select>
+    </p>
+
+    <p>
+      Ship To *: <input type="text" [(ngModel)]="shipTo">
+      STCC Code *: <input type="text" [(ngModel)]="stccCode">
+    </p>
+
+    <p>
+      Mode *:
+      <select [(ngModel)]="mode">
+        @for (m of modeList; track m) {
+          <option>{{ m }}</option>
+        }
+      </select>
+      Pack Type *:
+      <select [(ngModel)]="packType">
+        @for (p of packTypeList; track p) {
+          <option>{{ p }}</option>
+        }
+      </select>
+    </p>
+
+    <p>
+      <button (click)="CopyRates()">Copy Cost 01 (Oct 26) to All Months</button>
+    </p>
+
+    <p>
+      Cost 01 (Oct 26) *: <input type="number" [(ngModel)]="oct26">
+      Cost 02 (Nov 26) *: <input type="number" [(ngModel)]="nov26">
+      Cost 03 (Dec 26) *: <input type="number" [(ngModel)]="dec26">
+      Cost 04 (Jan 27) *: <input type="number" [(ngModel)]="jan27">
+    </p>
+
+    <button (click)="AddFreightRate()">Add to Vault Grid</button>
+    <h3>{{ result }}</h3>
+
+    <hr>
+    <h3>Vault Freight Rates Grid</h3>
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>Select</th>
+        <th>Ship To</th>
+        <th>Ship From</th>
+        <th>STCC Code</th>
+        <th>Mode</th>
+        <th>Pack Type</th>
+        <th>Cost 01</th>
+        <th>Cost 02</th>
+        <th>Cost 03</th>
+        <th>Cost 04</th>
+      </tr>
+      @for (row of savedRatesList; track row) {
+        <tr>
+          <td><input type="checkbox"></td>
+          <td>{{ row.shipTo }}</td>
+          <td>{{ row.shipFrom }}</td>
+          <td>{{ row.stccCode }}</td>
+          <td>{{ row.mode }}</td>
+          <td>{{ row.packType }}</td>
+          <td>{{ row.oct26 }}</td>
+          <td>{{ row.nov26 }}</td>
+          <td>{{ row.dec26 }}</td>
+          <td>{{ row.jan27 }}</td>
+        </tr>
+      }
+    </table>
+  `
+})
+export class App {
+  location = 'US01 - Ardent Mills, LLC';
+  shipFrom = '';
+  shipTo = '';
+  stccCode = '';
+  mode = '';
+  packType = '';
+  oct26 = 0;
+  nov26 = 0;
+  dec26 = 0;
+  jan27 = 0;
+  result: any = '';
+
+  sqlShipFromList = [
+    '1000 - LLC INTRANSIT, DENVER, CO',
+    '1001 - ALBANY NY, ALBANY, NY',
+    '1002 - ALTON IL, ALTON, IL',
+    '1003 - ARLINGTON OR, ARLINGTON, OR',
+    '1004 - AYER MA, AYER, MA',
+    '1017 - KENOSHA WI, KENOSHA, WI'
+  ];
+
+  modeList = ['Truck', 'Air', 'Rail'];
+  packTypeList = ['Bulk', 'Sack'];
+
+  // Starts 100% empty! Every row comes dynamically from the user on the screen!
+  savedRatesList: any = [];
+
+  CopyRates() {
+    this.nov26 = this.oct26;
+    this.dec26 = this.oct26;
+    this.jan27 = this.oct26;
+  }
+
+  AddFreightRate() {
+    if (this.shipFrom == '' || this.shipTo == '' || this.mode == '') {
+      this.result = 'Error: Please select Ship From, Ship To, and Mode!';
+    } else {
+      this.savedRatesList.push({
+        shipTo: this.shipTo,
+        shipFrom: this.shipFrom,
+        stccCode: this.stccCode,
+        mode: this.mode,
+        packType: this.packType,
+        oct26: this.oct26,
+        nov26: this.nov26,
+        dec26: this.dec26,
+        jan27: this.jan27
+      });
+      this.result = 'Added Row to Vault Grid: ' + this.shipFrom + ' -> ' + this.shipTo;
+    }
+  }
+}

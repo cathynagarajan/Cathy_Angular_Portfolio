@@ -1,0 +1,28 @@
+{
+  "model_type": "GraphSAGE-2Hop-Residual-GNN",
+  "embedding_dim": 384,
+  "self_alpha": 0.68,
+  "hop1_beta": 0.24,
+  "hop2_gamma": 0.08,
+  "relation_weights": {
+    "CALLS": 1.0,
+    "DEPENDS_ON": 0.95,
+    "IMPORTS": 0.85,
+    "EXPOSES_ENDPOINT": 0.9,
+    "HOSTS_SERVICE": 0.85,
+    "DEPLOYED_ON": 0.85,
+    "APPLIES_MANIFEST": 0.8,
+    "TARGETS_NODE": 0.8,
+    "DOCUMENTS": 0.75,
+    "REFERENCES": 0.7,
+    "CONTAINS_SECTION": 0.85,
+    "HAS_CHAT_TURN": 0.85,
+    "DISCUSSED_FILE": 0.9,
+    "MENTIONS_TOPIC": 0.75
+  },
+  "graph_stats": {
+    "nodes": 262,
+    "edges": 564,
+    "updated_at": "2026-11-11T21:17:09.546132+00:00"
+  }
+}

@@ -1,0 +1,234 @@
+// ============================================================================
+// CATHY'S SBX CAFÉ — REAL STARBUCKS MENU EXPERIENCE (app.ts)
+// Click "Coffees" -> All Coffees appear!
+// Click "Tea & Chai" -> All Chais & Teas appear!
+// Click "Bakery & Biscuits" -> Lemon Pound Cake, Pistachio Cake, Bread & Biscuits appear!
+// Plus: SBX Loyalty / Member ID Rewards Bar + Theme Switch + Live Cart!
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
+
+@Component({
+  selector: 'app-root',
+  imports: [
+    FormsModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatCardModule,
+    MatExpansionModule
+  ],
+  template: `
+    <!-- ================================================================== -->
+    <!-- #2 UP-NAV: Real Starbucks Header Bar                               -->
+    <!-- ================================================================== -->
+    <mat-toolbar [style.background]="isCaramelTheme ? '#78350f' : '#1e3932'"
+                 style="color: white; display: flex; justify-content: space-between; padding: 0 20px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button mat-raised-button (click)="sidenav.toggle()">
+          ☰ Menu
+        </button>
+        <span style="font-weight: 800; letter-spacing: 1px; font-size: 18px;">
+          ☕ CATHY'S SBX RESERVE
+        </span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px; font-size: 14px;">
+        <mat-slide-toggle [(ngModel)]="isCaramelTheme">
+          <span style="color: white;">
+            {{ isCaramelTheme ? '🍯 Caramel Roast Theme' : '🌲 SBX Forest Green' }}
+          </span>
+        </mat-slide-toggle>
+
+        <span style="background: #00704A; border: 2px solid #cba258; color: white; padding: 4px 14px; border-radius: 20px; font-weight: bold;">
+          🛒 Bag ({{ cartCount }}) — $ {{ cartTotal.toFixed(2) }}
+        </span>
+      </div>
+    </mat-toolbar>
+
+    <!-- ================================================================== -->
+    <!-- #3 CONTAINER: Holds Left Menu (#4) + Right Menu Grid Together      -->
+    <!-- ================================================================== -->
+    <mat-sidenav-container style="height: 90vh;">
+
+      <!-- #4 LEFT SIDE-NAV: Expandable Drinks & Food Categories -->
+      <mat-sidenav #sidenav mode="side" opened
+                   style="width: 270px; padding: 16px; background: #f9f9f9; border-right: 1px solid #e2e8f0;">
+        <h3 style="margin-top: 0; color: #1e3932; font-weight: 800;">Menu</h3>
+
+        <!-- EXPANDABLE PANEL 1: DRINKS (Coffee vs. Tea & Chai) -->
+        <mat-expansion-panel [expanded]="true" style="margin-bottom: 10px;">
+          <mat-expansion-panel-header>
+            <strong>☕ Drinks</strong>
+          </mat-expansion-panel-header>
+
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;"
+                    (click)="showCategory('Coffee')">
+              ☕ Hot & Iced Coffees
+            </button>
+          </p>
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;"
+                    (click)="showCategory('Tea')">
+              🫖 Chai & Artisanal Teas
+            </button>
+          </p>
+        </mat-expansion-panel>
+
+        <!-- EXPANDABLE PANEL 2: FOOD (Bakery, Cakes, Bread & Biscuits) -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <strong>🥐 Food & Bakery</strong>
+          </mat-expansion-panel-header>
+
+          <p style="margin: 6px 0;">
+            <button mat-button style="width: 100%; text-align: left;"
+                    (click)="showCategory('Bakery')">
+              🍋 Bakery, Cakes & Biscuits
+            </button>
+          </p>
+        </mat-expansion-panel>
+      </mat-sidenav>
+
+      <!-- RIGHT MAIN CONTENT: Loyalty Bar + Starbucks Multi-Card Grid! -->
+      <mat-sidenav-content [style.background]="isCaramelTheme ? '#fffbeb' : '#f1f8f5'" style="padding: 24px;">
+
+        <!-- SBX REWARDS / LOYALTY # BAR -->
+        <div style="background: white; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #00704A; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <strong style="color: #1e3932;">⭐ SBX Rewards® Loyalty #:</strong>
+            <input type="text"
+                   [(ngModel)]="memberId"
+                   placeholder="Enter Member ID (e.g. SBX100)"
+                   style="padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 20px; width: 210px;" />
+            <button mat-raised-button (click)="checkLoyalty()" style="background: #00704A; color: white; border-radius: 20px;">
+              Link Account
+            </button>
+          </div>
+          <span style="font-weight: bold; color: #00704A;">{{ loyaltyMessage }}</span>
+        </div>
+
+        <!-- CATEGORY HEADING -->
+        <h2 style="color: #1e3932; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px;">
+          {{ categoryTitle }}
+        </h2>
+
+        @if (statusMessage != '') {
+          <div style="background: #d1fae5; color: #065f46; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-weight: bold;">
+            {{ statusMessage }}
+          </div>
+        }
+
+        <!-- STARBUCKS MENU GRID: Loops through ALL items in the clicked category! -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;">
+          @for (item of displayedItems; track item.name) {
+            <mat-card style="padding: 18px; background: white; border-radius: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+              <!-- Signature Starbucks Deep-Green Circle Badge -->
+              <div style="width: 110px; height: 110px; margin: 0 auto 12px auto; border-radius: 50%; background: #1e3932; display: flex; align-items: center; justify-content: center; font-size: 48px; box-shadow: 0 4px 10px rgba(30,57,50,0.25);">
+                {{ item.icon }}
+              </div>
+
+              <h3 style="margin: 6px 0 4px 0; color: #1e3932; font-size: 17px;">{{ item.name }}</h3>
+              <p style="color: #64748b; font-size: 13px; min-height: 36px; margin: 0 0 8px 0;">{{ item.desc }}</p>
+              <p style="font-weight: 800; color: #00704A; font-size: 16px; margin: 4px 0 10px 0;">
+                $ {{ item.price.toFixed(2) }} · <span style="font-weight: normal; color: #64748b; font-size: 12px;">{{ item.calories }} cal</span>
+              </p>
+
+              <div style="margin-bottom: 12px; font-size: 13px;">
+                <mat-slide-toggle [(ngModel)]="item.warm">
+                  {{ item.warmLabel }}
+                </mat-slide-toggle>
+              </div>
+
+              <button mat-raised-button
+                      (click)="addToCart(item)"
+                      [style.background]="isCaramelTheme ? '#d97706' : '#00704A'"
+                      style="color: white; border-radius: 20px; width: 100%;">
+                + Add to Order
+              </button>
+            </mat-card>
+          }
+        </div>
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class App {
+  isCaramelTheme: boolean = false;
+  memberId: string = '';
+  loyaltyMessage: string = '';
+  cartCount: number = 0;
+  cartTotal: number = 0;
+  statusMessage: string = '';
+
+  categoryTitle: string = '☕ Hot & Iced Coffees';
+
+  // 1. ALL COFFEES
+  coffeeList = [
+    { name: 'Caramel Macchiato', desc: 'Freshly steamed milk with vanilla-flavored syrup & caramel drizzle', price: 5.45, calories: 250, icon: '☕', warm: true, warmLabel: 'Extra Hot' },
+    { name: 'Caffè Latte', desc: 'Dark, rich signature espresso balanced with steamed milk', price: 4.95, calories: 190, icon: '🥛', warm: true, warmLabel: 'Extra Hot' },
+    { name: 'Caffè Americano', desc: 'Espresso shots topped with hot water for a rich crema layer', price: 3.95, calories: 15, icon: '🖤', warm: true, warmLabel: 'Extra Hot' },
+    { name: 'Brown Sugar Oat Espresso', desc: 'Blonde espresso shaken with brown sugar & cinnamon over oatmilk', price: 5.75, calories: 120, icon: '🧊', warm: false, warmLabel: 'Light Ice' }
+  ];
+
+  // 2. ALL CHAI & TEAS
+  teaList = [
+    { name: 'Masala Chai Tea Latte', desc: 'Black tea infused with cardamom, cinnamon, ginger & steamed milk', price: 5.25, calories: 240, icon: '🫖', warm: true, warmLabel: 'Extra Hot' },
+    { name: 'Iced Dirty Chai Latte', desc: 'Spiced black tea blended with milk, ice & a bold shot of espresso', price: 5.65, calories: 260, icon: '🥤', warm: false, warmLabel: 'Light Ice' },
+    { name: 'Matcha Green Tea Latte', desc: 'Smooth & creamy ceremonial matcha sweetened just right with milk', price: 5.45, calories: 240, icon: '🍵', warm: true, warmLabel: 'Extra Hot' },
+    { name: 'London Fog Earl Grey', desc: 'Bright, citrusy Earl Grey tea with lavender & vanilla foam', price: 4.95, calories: 180, icon: '🌿', warm: true, warmLabel: 'Extra Hot' }
+  ];
+
+  // 3. ALL BAKERY, CAKES, BREAD & BISCUITS
+  bakeryList = [
+    { name: 'Iced Lemon Pound Cake', desc: 'Moist, zesty lemon cake topped with a sweet tart lemon icing', price: 4.25, calories: 470, icon: '🍋', warm: false, warmLabel: 'Warmed' },
+    { name: 'Pistachio Swirl Loaf Cake', desc: 'Rich pistachio bakery cake with roasted pistachio crumble', price: 4.65, calories: 410, icon: '🍰', warm: true, warmLabel: 'Warmed' },
+    { name: 'Banana Walnut Bread', desc: 'Home-style moist banana bread loaded with crunchy walnuts', price: 4.25, calories: 420, icon: '🍞', warm: true, warmLabel: 'Warmed' },
+    { name: 'Golden Butter Tea Biscuits', desc: 'Crisp, buttery bakery biscuits — made for dipping in hot Chai!', price: 3.50, calories: 310, icon: '🍪', warm: true, warmLabel: 'Warmed' }
+  ];
+
+  // Starts by showing all Coffees!
+  displayedItems = this.coffeeList;
+
+  // Switches the grid when you click Coffee, Tea, or Bakery in the Side-Nav!
+  showCategory(cat: string) {
+    this.statusMessage = '';
+    if (cat == 'Coffee') {
+      this.categoryTitle = '☕ Hot & Iced Coffees';
+      this.displayedItems = this.coffeeList;
+    } else if (cat == 'Tea') {
+      this.categoryTitle = '🫖 Chai & Artisanal Teas';
+      this.displayedItems = this.teaList;
+    } else if (cat == 'Bakery') {
+      this.categoryTitle = '🍋 Bakery, Cakes, Bread & Tea Biscuits';
+      this.displayedItems = this.bakeryList;
+    }
+  }
+
+  checkLoyalty() {
+    if (this.memberId == 'SBX100') {
+      this.loyaltyMessage = '🌟 VIP Gold Member Cathy! 1,250 Stars — Free Bakery Item Ready!';
+    } else if (this.memberId != '') {
+      this.loyaltyMessage = '✅ Member #' + this.memberId + ' linked! Earning 2★ per $1.';
+    } else {
+      this.loyaltyMessage = '⚠️ Please enter your SBX Loyalty # first!';
+    }
+  }
+
+  addToCart(item: any) {
+    this.cartCount = this.cartCount + 1;
+    this.cartTotal = this.cartTotal + item.price;
+    this.statusMessage = '✅ Added ' + item.name + ' (' + (item.warm ? item.warmLabel : 'Standard') + ') to your SBX Bag!';
+  }
+}

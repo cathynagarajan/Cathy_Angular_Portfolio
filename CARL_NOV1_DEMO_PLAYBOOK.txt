@@ -1,0 +1,65 @@
+================================================================================
+CATHY'S NOVEMBER 1 DEMO PLAYBOOK FOR CARL (ANGULAR 21 MENTOR SESSION)
+================================================================================
+
+1. WHICH 3 PROGRAMS SHOULD YOU DEMO ON NOV 1? (15-Minute Golden Lineup!)
+--------------------------------------------------------------------------------
+Don't try to show all 6 files—pick your "Big 3" that show your progression from
+basic logic to a real Ardent Mills Vault screen:
+
+  * DEMO #1 (2 mins): Class3_Divide_IfElse.txt
+    - WHY: Shows Two-Way Binding [(ngModel)], Event Binding (click), and
+      defensive if/else validation ("Denominator can't be zero").
+
+  * DEMO #2 (3 mins): Class3_ArithmeticGeometric.txt (or Class4_GreatestSmallestOf3.txt)
+    - WHY: Shows you didn't just copy UI templates—you wrote real computer science
+      algorithms (for loops for 40 terms of AP & GP, and compound if/else if/else
+      with && operators).
+
+  * DEMO #3 (5-7 mins — THE GRAND FINALE!): Class5_Vault_AddFreightRate.txt
+    (and Class6_Vault_FreightRate_Grid_Table.txt)
+    - WHY: Shows you immediately applied Angular 21 to Ardent Mills' real Vault
+      "Add Freight Rate" screen:
+      - Dropdowns (<select> + @for loop) for 1000-1004 Mills and Truck/Air/Rail
+      - One-click CopyRates() button copying Oct 26 across Nov/Dec/Jan
+      - Required field validation (if shipFrom == '' || shipTo == '' || mode == '')
+      - Live growing table on the screen using savedRatesList.push(...)!
+
+================================================================================
+2. THE 5 PLACES YOU COULD GET STUCK IN A LIVE DEMO (AND HOW TO PREVENT THEM!)
+================================================================================
+
+  * STUCK POINT #1: Notepad saves to the Desktop .txt file instead of live app.ts!
+    - Symptom: You press Ctrl+S in Notepad during the demo, and localhost:4200
+      doesn't change at all!
+    - Prevention / Fix: Keep ONLY ONE Notepad window open during the demo, and make
+      sure the title bar at the top of Notepad says "app.ts". To switch demos,
+      open the Desktop .txt file in a browser tab or read-only window, copy the text,
+      paste into your "app.ts" Notepad window, and press Ctrl+S!
+
+  * STUCK POINT #2: Clicking inside the blue PowerShell window freezes Angular!
+    - Symptom: localhost:4200 spins forever ("angular is sleeping").
+    - Why it happens: Clicking the mouse inside Windows PowerShell puts it into
+      "Select / Pause Mode".
+    - Fix in 1 second: Minimize the blue PowerShell window before the call starts!
+      If you ever click inside it, just press the [Esc] key twice to wake it up.
+
+  * STUCK POINT #3: Missing the first letter "i" in "import" or extra "}" at bottom
+    when copying & pasting!
+    - Symptom: Red error in PowerShell (TS1435 "mport" or TS1068 "Unexpected token }").
+    - Prevention / Fix: Always click inside app.ts, press Ctrl+A (Select All), press
+      Delete (so the file is 100% blank), and then press Ctrl+V (Paste) and Ctrl+S.
+
+  * STUCK POINT #4: Carl asks "Why did you write [(ngModel)] with both [ ] and ( )?"
+    - Your Exact Answer:
+      "It's Angular's 'Banana in a Box' Two-Way Data Binding! The square brackets [ ]
+       send data from my TypeScript class to the screen, and the parentheses ( ) send
+       whatever the user types on the screen back into my TypeScript variable!"
+
+  * STUCK POINT #5: Carl asks "What does @for (m of modeList; track m) do?"
+    - Your Exact Answer:
+      "modeList is my array ['Truck', 'Air', 'Rail'] in TypeScript. @for loops through
+       each item 'm' in modeList and creates an <option>{{ m }}</option> tag inside
+       the <select> dropdown automatically—and 'track m' tells Angular 21 how to track
+       each item uniquely so it updates fast!"
+================================================================================

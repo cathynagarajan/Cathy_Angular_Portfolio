@@ -1,0 +1,8 @@
+{
+  "single_repo_mode": true,
+  "git_remote_url": "",
+  "git_branch": "main",
+  "mcp_endpoint": "http://192.168.1.181:8000/mcp",
+  "vectordb_endpoint": "192.168.1.155:30432",
+  "installed_at": "2026-11-11T13:17:07.888696"
+}

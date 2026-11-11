@@ -1,0 +1,94 @@
+// ============================================================================
+// CATHY'S ANGULAR 21 PORTFOLIO — CLASS 5 (October 24, 2026)
+// Topic: Recreating Ardent Mills "Add Freight Rate" Screen!
+//        Uses Dropdowns (<select> + @for loop) for Ship From (1000-1004 Mills)
+//        and Mode (Truck, Air, Rail), plus CopyRates(), AddFreightRate(),
+//        and a live growing table using savedRatesList.push(...)!
+// ============================================================================
+
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule],
+  template: `
+    <h2>Add Freight Rate — Ardent Mills</h2>
+
+    <p>
+      Location: <input type="text" [(ngModel)]="location">
+      Ship From *:
+      <select [(ngModel)]="shipFrom">
+        @for (mill of sqlShipFromList; track mill) {
+          <option>{{ mill }}</option>
+        }
+      </select>
+    </p>
+    <p>
+      Ship To *: <input type="text" [(ngModel)]="shipTo">
+      Mode *:
+      <select [(ngModel)]="mode">
+        @for (m of modeList; track m) {
+          <option>{{ m }}</option>
+        }
+      </select>
+    </p>
+
+    <p>
+      <button (click)="CopyRates()">Copy Oct 26 Rate to All Months</button>
+    </p>
+
+    <p>
+      Oct 26 *: <input type="number" [(ngModel)]="oct26">
+      Nov 26 *: <input type="number" [(ngModel)]="nov26">
+      Dec 26 *: <input type="number" [(ngModel)]="dec26">
+      Jan 27 *: <input type="number" [(ngModel)]="jan27">
+    </p>
+
+    <button (click)="AddFreightRate()">Add</button>
+
+    <h3>{{ result }}</h3>
+
+    <h4>Saved Freight Rates Table:</h4>
+    @for (row of savedRatesList; track row) {
+      <p>{{ row }}</p>
+    }
+  `
+})
+export class App {
+  location = 'US01 - Ardent Mills, LLC';
+  shipFrom = '';
+  shipTo = '';
+  mode = '';
+  oct26 = 0;
+  nov26 = 0;
+  dec26 = 0;
+  jan27 = 0;
+  result: any = '';
+  savedRatesList: any = [];
+
+  sqlShipFromList = [
+    '1000 - LLC INTRANSIT, DENVER, CO',
+    '1001 - ALBANY NY, ALBANY, NY',
+    '1002 - ALTON IL, ALTON, IL',
+    '1003 - ARLINGTON OR, ARLINGTON, OR',
+    '1004 - AYER MA, AYER, MA'
+  ];
+
+  modeList = ['Truck', 'Air', 'Rail'];
+
+  CopyRates() {
+    this.nov26 = this.oct26;
+    this.dec26 = this.oct26;
+    this.jan27 = this.oct26;
+  }
+
+  AddFreightRate() {
+    if (this.shipFrom == '' || this.shipTo == '' || this.mode == '') {
+      this.result = 'Error: Please select Ship From, Ship To, and Mode!';
+    } else {
+      this.result = 'Added Rate: ' + this.shipFrom + ' -> ' + this.shipTo + ' (' + this.mode + ') at $' + this.oct26;
+      this.savedRatesList.push(this.result);
+    }
+  }
+}
